@@ -1,8 +1,4 @@
-"""
-Load and process images and labels.
-
-Copyright 2021. Siwei Wang.
-"""
+"""Load and process images and labels."""
 from typing import List, Tuple
 from os import environ, listdir, path
 from math import comb

@@ -1,8 +1,4 @@
-"""
-Train wound analysis model.
-
-Copyright 2021. Siwei Wang.
-"""
+"""Train wound analysis model."""
 from json import load
 from sklearn.model_selection import train_test_split  # type: ignore
 from tensorflow.keras.optimizers import Adam  # type: ignore

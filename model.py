@@ -1,8 +1,4 @@
-"""
-Define Siamese network model.
-
-Copyright 2021. Siwei Wang.
-"""
+"""Define Siamese network model."""
 from typing import Tuple
 from tensorflow.keras import Input, Model, Sequential  # type: ignore
 from tensorflow.keras.layers import Conv2D, MaxPooling2D  # type: ignore
@@ -14,7 +10,7 @@ MODEL_FILE = 'weights.h5'
 HYP_FILE = 'hyperparameters.json'
 
 
-def get_siamese_model(input_shape: Tuple[int, ...]):
+def get_siamese_model(input_shape: Tuple[int, ...]) -> Model:
     """Define and return siamese model given input and output shapes."""
     left_input = Input(input_shape)
     right_input = Input(input_shape)

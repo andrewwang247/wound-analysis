@@ -1,8 +1,4 @@
-"""
-Predict using wound analysis model.
-
-Copyright 2021. Siwei Wang.
-"""
+"""Predict using wound analysis model."""
 from typing import List
 from json import load
 from random import randrange
@@ -26,7 +22,6 @@ def pick_canonicals(images: np.ndarray, labels: List[int]) -> np.ndarray:
 def predict(siamese: Model, images: np.ndarray,
             labels: np.ndarray) -> np.ndarray:
     """Predict using wound analysis model and give 0-1 loss."""
-    print(images.shape, labels.shape)
     canon = pick_canonicals(images, labels)
     zero_one = np.empty(len(labels), dtype=bool)
     for idx, (img, lbl) in enumerate(zip(images, labels)):

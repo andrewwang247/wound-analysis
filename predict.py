@@ -1,48 +1,32 @@
-"""Predict using wound analysis model."""
-from typing import List
+"""Make predictions using encoder."""
 from json import load
-from random import randrange
-import numpy as np  # type: ignore
-from tensorflow.keras import Model  # type: ignore
-from data_process import load_data
-from model import get_siamese_model, MODEL_FILE, HYP_FILE
+from click import command, option, Path
+from data_process import open_img
+from model import get_encoder_model, ENCODER_FILE, HYP_FILE
 
 
-def pick_canonicals(images: np.ndarray, labels: List[int]) -> np.ndarray:
-    """Choose a random canonical image from each label."""
-    unique_labels = np.unique(labels)
-    canon = np.empty((len(unique_labels), *images.shape[1:]))
-    splits = [images[labels == unq] for unq in unique_labels]
-    choices = [randrange(group.shape[0]) for group in splits]
-    for idx, (split, choice) in enumerate(zip(splits, choices)):
-        canon[idx, ...] = split[choice]
-    return canon
+def load_encoder(width: int, height: int):
+    """Load encoder with weights."""
+    shape = (width, height, 3)
+    encoder = get_encoder_model(shape)
+    encoder.load_weights(ENCODER_FILE)
+    return encoder
 
 
-def predict(siamese: Model, images: np.ndarray,
-            labels: np.ndarray) -> np.ndarray:
-    """Predict using wound analysis model and give 0-1 loss."""
-    canon = pick_canonicals(images, labels)
-    zero_one = np.empty(len(labels), dtype=bool)
-    for idx, (img, lbl) in enumerate(zip(images, labels)):
-        img_repeat = np.stack([img] * len(canon))
-        output = siamese.predict((canon, img_repeat))
-        pred = np.argmax(output.flatten())
-        zero_one[idx] = (pred == lbl)
-    return zero_one
-
-
-def main():
-    """Run prediction on all images."""
+@command()
+@option('--image', '-i', type=Path(exists=True), required=True,
+        help='Path to prediction image.')
+def predict(image: str):
+    """Make predictions using encoder."""
     with open(HYP_FILE) as fin:
         hyp: dict = load(fin)
-    images, labels = load_data(hyp)
-    siamese = get_siamese_model(images.shape[1:])
-    siamese.load_weights(MODEL_FILE)
-    print(f'Model weights loaded from {MODEL_FILE}')
-    loss = predict(siamese, images, labels)
-    print(f'0-1 Accuracy: {np.count_nonzero(loss) / len(loss)}')
+    width = hyp['img_width']
+    height = hyp['img_height']
+    encoder = load_encoder(width, height)
+    blur = hyp['blur_radius']
+    img = open_img(image, width, height, blur)
+    print(img.shape)
 
 
 if __name__ == '__main__':
-    main()
+    predict()

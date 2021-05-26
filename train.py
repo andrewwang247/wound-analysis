@@ -1,10 +1,28 @@
 """Train wound analysis model."""
 from json import load
+from typing import Dict
+import numpy as np  # type: ignore
 from sklearn.model_selection import train_test_split  # type: ignore
 from tensorflow.keras.optimizers import Adam  # type: ignore
-from tensorflow.keras.metrics import BinaryAccuracy  # type: ignore
+from tensorflow.keras.callbacks import ModelCheckpoint  # type: ignore
+from tensorflow.keras import Model  # type: ignore
 from data_process import gpu_init, generate_pairs, load_data, split_pairs
-from model import get_siamese_model, MODEL_FILE, HYP_FILE
+from model import get_siamese_model, SIAMESE_FILE, HYP_FILE, ENCODER_FILE
+
+
+def compute_class_weights(y_train: np.ndarray) -> Dict[int, float]:
+    """Compute class weights from labels."""
+    num_true = np.count_nonzero(y_train)
+    num_false = len(y_train) - num_true
+    weights = len(y_train) / np.array([num_true, num_false]) / 2
+    return dict(zip([True, False], weights / np.sum(weights)))
+
+
+def extract_encoder(siamese: Model) -> Model:
+    """Extract encoder part of siamese network."""
+    enc_layer = siamese.get_layer('sequential')
+    return Model(inputs=enc_layer.input,
+                 outputs=enc_layer.output)
 
 
 def train():
@@ -17,14 +35,22 @@ def train():
         img_pairs, lbl_pairs, test_size=hyp['test_size'], stratify=lbl_pairs)
     siamese = get_siamese_model(images.shape[1:])
     siamese.summary()
-    siamese.compile(optimizer=Adam(lr=hyp['learning_rate']),
+    siamese.compile(optimizer=Adam(learning_rate=hyp['learning_rate']),
                     loss='binary_crossentropy',
-                    metrics=[BinaryAccuracy()])
+                    metrics=['accuracy'])
     siamese.fit(split_pairs(x_train), y_train,
-                epochs=hyp['epochs'], batch_size=hyp['batch_size'])
+                epochs=hyp['epochs'],
+                batch_size=hyp['batch_size'],
+                class_weight=compute_class_weights(y_train),
+                validation_split=hyp['val_size'],
+                callbacks=[ModelCheckpoint(SIAMESE_FILE,
+                                           save_best_only=True)])
+    siamese.load_weights(SIAMESE_FILE)
     siamese.evaluate(split_pairs(x_test), y_test)
-    siamese.save_weights(MODEL_FILE)
-    print(f'Model weights saved to {MODEL_FILE}')
+    print(f'Siamese weights saved to {SIAMESE_FILE}')
+    encoder = extract_encoder(siamese)
+    encoder.save_weights(ENCODER_FILE)
+    print(f'Encoder weights saved to {ENCODER_FILE}')
 
 
 if __name__ == '__main__':

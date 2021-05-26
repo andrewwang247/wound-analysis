@@ -1,5 +1,5 @@
 """Load and process images and labels."""
-from typing import List, Tuple
+from typing import Tuple
 from os import environ, listdir, path
 from math import comb
 from itertools import combinations
@@ -21,10 +21,10 @@ def gpu_init():
     environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 
-def _open_img(fpath: str,
-              width: int,
-              height: int,
-              blur_radius: int) -> np.ndarray:
+def open_img(fpath: str,
+             width: int,
+             height: int,
+             blur_radius: int) -> np.ndarray:
     """Open, resize, and blur image."""
     img = Image.open(path.join(IMG_DIR, fpath)) \
         .resize((width, height)) \
@@ -32,19 +32,19 @@ def _open_img(fpath: str,
     return np.asarray_chkfinite(img)
 
 
-def _load_imgs(width: int, height: int, blur_radius: int) -> np.ndarray:
+def load_imgs(width: int, height: int, blur_radius: int) -> np.ndarray:
     """Load, preprocess, and normalize images from IMG_DIR."""
     direc = listdir(IMG_DIR)
     images = np.empty((len(direc), height, width, 3), dtype=int)
     for idx, fpath in tqdm(enumerate(direc), total=len(direc)):
-        images[idx, ...] = _open_img(fpath, width, height, blur_radius)
+        images[idx, ...] = open_img(fpath, width, height, blur_radius)
     return images / NORM
 
 
-def load_data(hyp: dict) -> Tuple[np.ndarray, List[int]]:
+def load_data(hyp: dict) -> Tuple[np.ndarray, np.ndarray]:
     """Load images and labels with hyperparameters."""
     print('Loading and processing data...')
-    images = _load_imgs(
+    images = load_imgs(
         hyp['img_width'],
         hyp['img_height'],
         hyp['blur_radius'])
@@ -52,7 +52,7 @@ def load_data(hyp: dict) -> Tuple[np.ndarray, List[int]]:
     return images, labels
 
 
-def generate_pairs(images: np.ndarray, labels: List[int]) \
+def generate_pairs(images: np.ndarray, labels: np.ndarray) \
         -> Tuple[np.ndarray, np.ndarray]:
     """Generate Siamese image pairs."""
     num_combs = comb(len(labels), 2)

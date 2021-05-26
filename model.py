@@ -6,15 +6,13 @@ from tensorflow.keras.layers import Flatten, Dense, Lambda  # type: ignore
 from tensorflow.keras.regularizers import l2  # type: ignore
 from tensorflow.keras.backend import abs as K_abs  # type: ignore
 
-MODEL_FILE = 'weights.h5'
+SIAMESE_FILE = 'siamese.h5'
+ENCODER_FILE = 'encoder.h5'
 HYP_FILE = 'hyperparameters.json'
 
 
-def get_siamese_model(input_shape: Tuple[int, ...]) -> Model:
-    """Define and return siamese model given input and output shapes."""
-    left_input = Input(input_shape)
-    right_input = Input(input_shape)
-
+def get_encoder_model(input_shape: Tuple[int, ...]) -> Model:
+    """Get encoder submodel given input shape."""
     model = Sequential()
     model.add(Conv2D(64, (10, 10), input_shape=input_shape,
                      activation='relu',
@@ -35,6 +33,15 @@ def get_siamese_model(input_shape: Tuple[int, ...]) -> Model:
     model.add(Flatten())
     model.add(Dense(4096, activation='sigmoid',
                     kernel_regularizer=l2(1e-3)))
+    return model
+
+
+def get_siamese_model(input_shape: Tuple[int, ...]) -> Model:
+    """Define and return siamese model given input shape."""
+    left_input = Input(input_shape)
+    right_input = Input(input_shape)
+
+    model = get_encoder_model(input_shape)
 
     encoded_l = model(left_input)
     encoded_r = model(right_input)

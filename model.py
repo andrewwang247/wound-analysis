@@ -16,8 +16,8 @@ HYP_FILE = 'hyperparameters.json'
 
 def get_encoder_model(input_shape: Tuple[int, ...]) -> Model:
     """Get encoder submodel given input shape."""
-    model = Sequential()
-    model.add(Conv2D(64, (10, 10), input_shape=input_shape,
+    model = Sequential(name='encoder')
+    model.add(Conv2D(64, (9, 9), input_shape=input_shape,
                      activation='relu',
                      padding='same',
                      kernel_regularizer=l2(2e-4)))
@@ -26,15 +26,15 @@ def get_encoder_model(input_shape: Tuple[int, ...]) -> Model:
                      padding='same',
                      kernel_regularizer=l2(2e-4)))
     model.add(MaxPooling2D())
-    model.add(Conv2D(128, (4, 4), activation='relu',
+    model.add(Conv2D(128, (5, 5), activation='relu',
                      padding='same',
                      kernel_regularizer=l2(2e-4)))
     model.add(MaxPooling2D())
-    model.add(Conv2D(256, (4, 4), activation='relu',
+    model.add(Conv2D(256, (3, 3), activation='relu',
                      padding='same',
                      kernel_regularizer=l2(2e-4)))
     model.add(Flatten())
-    model.add(Dense(4096, activation='sigmoid',
+    model.add(Dense(2048, activation='sigmoid',
                     kernel_regularizer=l2(1e-3)))
     return model
 
@@ -53,4 +53,6 @@ def get_siamese_model(input_shape: Tuple[int, ...]) -> Model:
     l1_distance = l1_layer([encoded_l, encoded_r])
     pred = Dense(1, activation='sigmoid')(l1_distance)
 
-    return Model(inputs=[left_input, right_input], outputs=pred)
+    return Model(inputs=[left_input, right_input],
+                 outputs=pred,
+                 name='siamese')

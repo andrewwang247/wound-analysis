@@ -3,8 +3,9 @@
 from json import load
 from typing import Tuple
 import numpy as np  # type: ignore
+from PIL import Image  # type: ignore
 from tensorflow.keras.layers import Layer  # type: ignore
-from data_process import load_data
+from data_process import load_data, process_img
 from model import get_encoder_model, get_siamese_model
 from model import ENCODER_FILE, HYP_FILE, SIAMESE_FILE
 from center import CENTERS_FILE
@@ -39,6 +40,23 @@ def test_preds():
         pred = np.argmax(outputs)
         zero_one[idx] = (pred == lbl)
     print('Accuracy =', np.count_nonzero(zero_one) / len(zero_one))
+
+
+def predict(img: Image.Image) -> int:
+    """Predict a label for the given image."""
+    with open(HYP_FILE) as fin:
+        hyp: dict = load(fin)
+    width = hyp['img_width']
+    height = hyp['img_height']
+    blur_radius = hyp['blur_radius']
+    in_img = process_img(img, width, height, blur_radius)
+    encoder = load_encoder(in_img.shape)
+    dense = get_dense(in_img.shape)
+    centers = np.load(CENTERS_FILE)
+
+    rep = encoder(in_img[np.newaxis, ...])
+    outputs = dense(np.abs(centers - rep))
+    return np.argmax(outputs)
 
 
 if __name__ == '__main__':

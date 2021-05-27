@@ -10,7 +10,7 @@ from tqdm import tqdm  # type: ignore
 
 IMG_DIR = 'images'
 LABEL_FILE = 'labels.txt'
-NORM = 255
+NORM = (2.0**8 - 1)
 
 
 def gpu_init():
@@ -28,19 +28,26 @@ def open_img(fpath: str,
              add_path=True) -> np.ndarray:
     """Open, resize, and blur image."""
     img = Image.open(path.join(IMG_DIR, fpath)
-                     if add_path else fpath) \
-        .resize((width, height)) \
-        .filter(GaussianBlur(blur_radius))
-    return np.asarray_chkfinite(img)
+                     if add_path else fpath)
+    return process_img(img, width, height, blur_radius)
+
+
+def process_img(img: Image.Image,
+                width: int,
+                height: int,
+                blur_radius: int) -> np.ndarray:
+    """Preprocess image according to spec."""
+    proc = img.resize((width, height)).filter(GaussianBlur(blur_radius))
+    return np.asarray_chkfinite(proc) / NORM
 
 
 def load_imgs(width: int, height: int, blur_radius: int) -> np.ndarray:
     """Load, preprocess, and normalize images from IMG_DIR."""
     direc = listdir(IMG_DIR)
-    images = np.empty((len(direc), height, width, 3), dtype=int)
+    images = np.empty((len(direc), height, width, 3), dtype=float)
     for idx, fpath in tqdm(enumerate(direc), total=len(direc)):
         images[idx, ...] = open_img(fpath, width, height, blur_radius)
-    return images / NORM
+    return images
 
 
 def load_data(hyp: dict) -> Tuple[np.ndarray, np.ndarray]:

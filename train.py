@@ -22,7 +22,7 @@ def compute_class_weights(y_train: np.ndarray) -> Dict[int, float]:
 
 def extract_encoder(siamese: Model) -> Model:
     """Extract encoder part of siamese network."""
-    enc_layer = siamese.get_layer('sequential')
+    enc_layer = siamese.get_layer('encoder')
     return Model(inputs=enc_layer.input,
                  outputs=enc_layer.output)
 

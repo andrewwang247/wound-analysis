@@ -1,4 +1,5 @@
 """Define Siamese network model."""
+# pylint: disable=no-name-in-module
 from typing import Tuple
 from tensorflow.keras import Input, Model, Sequential  # type: ignore
 from tensorflow.keras.layers import Conv2D, MaxPooling2D  # type: ignore
@@ -6,8 +7,10 @@ from tensorflow.keras.layers import Flatten, Dense, Lambda  # type: ignore
 from tensorflow.keras.regularizers import l2  # type: ignore
 from tensorflow.keras.backend import abs as K_abs  # type: ignore
 
+
 SIAMESE_FILE = 'siamese.h5'
 ENCODER_FILE = 'encoder.h5'
+DENSE_FILE = 'dense.h5'
 HYP_FILE = 'hyperparameters.json'
 
 

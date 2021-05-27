@@ -1,13 +1,15 @@
 """Train wound analysis model."""
+# pylint: disable=no-name-in-module
 from json import load
 from typing import Dict
 import numpy as np  # type: ignore
 from sklearn.model_selection import train_test_split  # type: ignore
+from tensorflow.keras import Model  # type: ignore
 from tensorflow.keras.optimizers import Adam  # type: ignore
 from tensorflow.keras.callbacks import ModelCheckpoint  # type: ignore
-from tensorflow.keras import Model  # type: ignore
 from data_process import gpu_init, generate_pairs, load_data, split_pairs
-from model import get_siamese_model, SIAMESE_FILE, HYP_FILE, ENCODER_FILE
+from model import get_siamese_model
+from model import SIAMESE_FILE, HYP_FILE, ENCODER_FILE
 
 
 def compute_class_weights(y_train: np.ndarray) -> Dict[int, float]:

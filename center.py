@@ -5,6 +5,9 @@ from data_process import load_data
 from model import get_encoder_model, ENCODER_FILE, HYP_FILE
 
 
+CENTERS_FILE = 'centers.npy'
+
+
 def center_clusters(encodings: np.ndarray,
                     labels: np.ndarray) -> np.ndarray:
     """Compute centers of all label clusters."""
@@ -24,7 +27,7 @@ def main():
     encoder.load_weights(ENCODER_FILE)
     centers = center_clusters(encoder(images), labels)
     print('Finished computing cluster centers.')
-    np.save('centers.npy', centers)
+    np.save(CENTERS_FILE, centers)
 
 
 if __name__ == '__main__':

@@ -24,9 +24,11 @@ def gpu_init():
 def open_img(fpath: str,
              width: int,
              height: int,
-             blur_radius: int) -> np.ndarray:
+             blur_radius: int,
+             add_path=True) -> np.ndarray:
     """Open, resize, and blur image."""
-    img = Image.open(path.join(IMG_DIR, fpath)) \
+    img = Image.open(path.join(IMG_DIR, fpath)
+                     if add_path else fpath) \
         .resize((width, height)) \
         .filter(GaussianBlur(blur_radius))
     return np.asarray_chkfinite(img)

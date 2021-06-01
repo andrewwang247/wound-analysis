@@ -4,12 +4,13 @@ from json import load
 from typing import Dict
 import numpy as np  # type: ignore
 from sklearn.model_selection import train_test_split  # type: ignore
-from tensorflow.keras import Model  # type: ignore
+from tensorflow.keras import Model, Sequential  # type: ignore
+from tensorflow.keras.layers import InputLayer  # type: ignore
 from tensorflow.keras.optimizers import Adam  # type: ignore
 from tensorflow.keras.callbacks import ModelCheckpoint  # type: ignore
 from data_process import gpu_init, generate_pairs, load_data, split_pairs
 from model import get_siamese_model
-from model import SIAMESE_FILE, HYP_FILE, ENCODER_FILE
+from model import SIAMESE_FILE, HYP_FILE, ENCODER_FILE, DENSE_FILE
 
 
 def compute_class_weights(y_train: np.ndarray) -> Dict[int, float]:
@@ -25,6 +26,14 @@ def extract_encoder(siamese: Model) -> Model:
     enc_layer = siamese.get_layer('encoder')
     return Model(inputs=enc_layer.input,
                  outputs=enc_layer.output)
+
+
+def extract_dense(siamese: Model) -> Model:
+    """Extract dense part of siamese network."""
+    return Sequential([
+        InputLayer((None, 2048)),
+        siamese.layers[-1]
+    ], name='dense')
 
 
 def train():
@@ -49,10 +58,13 @@ def train():
                                            save_best_only=True)])
     siamese.load_weights(SIAMESE_FILE)
     siamese.evaluate(split_pairs(x_test), y_test)
-    print(f'Siamese weights saved to {SIAMESE_FILE}')
+    print('Siamese weights saved to', SIAMESE_FILE)
     encoder = extract_encoder(siamese)
     encoder.save_weights(ENCODER_FILE)
-    print(f'Encoder weights saved to {ENCODER_FILE}')
+    print('Encoder weights saved to ', ENCODER_FILE)
+    dense = extract_dense(siamese)
+    dense.save_weights(DENSE_FILE)
+    print('Dense weights saved to ', DENSE_FILE)
 
 
 if __name__ == '__main__':

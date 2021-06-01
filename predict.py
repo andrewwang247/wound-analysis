@@ -4,10 +4,11 @@ from json import load
 from typing import Tuple
 import numpy as np  # type: ignore
 from PIL import Image  # type: ignore
-from tensorflow.keras.layers import Layer  # type: ignore
+from tensorflow.keras import Model  # type: ignore
 from data_process import load_data, process_img
 from model import get_encoder_model, get_siamese_model
-from model import ENCODER_FILE, HYP_FILE, SIAMESE_FILE
+from model import ENCODER_FILE, HYP_FILE, DENSE_FILE
+from train import extract_dense
 from center import CENTERS_FILE
 
 
@@ -18,11 +19,12 @@ def load_encoder(in_shape: Tuple[int, ...]):
     return encoder
 
 
-def get_dense(in_shape: Tuple[int, ...]) -> Layer:
+def get_dense(in_shape: Tuple[int, ...]) -> Model:
     """Load final dense layer with weights."""
     siamese = get_siamese_model(in_shape)
-    siamese.load_weights(SIAMESE_FILE)
-    return siamese.layers[-1]
+    dense = extract_dense(siamese)
+    dense.load_weights(DENSE_FILE)
+    return dense
 
 
 def test_preds():

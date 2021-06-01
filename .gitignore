@@ -1,6 +1,5 @@
 images/
-*.h5
-*.npy
+siamese.h5
 
 # Python
 *.pyc

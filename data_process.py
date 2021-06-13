@@ -1,12 +1,11 @@
 """Load and process images and labels."""
 from typing import Tuple
 from os import environ, listdir, path
-from math import comb
+from scipy.special import comb
 from itertools import combinations
 from PIL import Image  # type: ignore
 from PIL.ImageFilter import GaussianBlur  # type: ignore
 import numpy as np  # type: ignore
-from tqdm import tqdm  # type: ignore
 
 IMG_DIR = 'images'
 LABEL_FILE = 'labels.txt'
@@ -45,7 +44,7 @@ def load_imgs(width: int, height: int, blur_radius: int) -> np.ndarray:
     """Load, preprocess, and normalize images from IMG_DIR."""
     direc = listdir(IMG_DIR)
     images = np.empty((len(direc), height, width, 3), dtype=float)
-    for idx, fpath in tqdm(enumerate(direc), total=len(direc)):
+    for idx, fpath in enumerate(direc):
         images[idx, ...] = open_img(fpath, width, height, blur_radius)
     return images
 

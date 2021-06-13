@@ -7,7 +7,6 @@ from tensorflow.keras.layers import Flatten, Dense, Lambda  # type: ignore
 from tensorflow.keras.regularizers import l2  # type: ignore
 from tensorflow.keras.backend import abs as K_abs  # type: ignore
 
-
 SIAMESE_FILE = 'siamese.h5'
 ENCODER_FILE = 'encoder.h5'
 DENSE_FILE = 'dense.h5'

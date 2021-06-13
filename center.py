@@ -1,8 +1,8 @@
 """Compute cluster centers based on encoding."""
 from json import load
 import numpy as np  # type: ignore
-from data_process import load_data
-from model import get_encoder_model, ENCODER_FILE, HYP_FILE
+from wound_analysis.api.siamese_model.data_process import load_data
+from wound_analysis.api.siamese_model.model import get_encoder_model, ENCODER_FILE, HYP_FILE
 
 
 CENTERS_FILE = 'centers.npy'

@@ -3,14 +3,14 @@
 from json import load
 from typing import Dict
 import numpy as np  # type: ignore
-from sklearn.model_selection import train_test_split  # type: ignore
+# from sklearn.model_selection import train_test_split  # type: ignore
 from tensorflow.keras import Model, Sequential  # type: ignore
 from tensorflow.keras.layers import InputLayer  # type: ignore
 from tensorflow.keras.optimizers import Adam  # type: ignore
 from tensorflow.keras.callbacks import ModelCheckpoint  # type: ignore
-from data_process import gpu_init, generate_pairs, load_data, split_pairs
-from model import get_siamese_model
-from model import SIAMESE_FILE, HYP_FILE, ENCODER_FILE, DENSE_FILE
+from wound_analysis.api.siamese_model.data_process import gpu_init, generate_pairs, load_data, split_pairs
+from wound_analysis.api.siamese_model.model import get_siamese_model
+from wound_analysis.api.siamese_model.model import SIAMESE_FILE, HYP_FILE, ENCODER_FILE, DENSE_FILE
 
 
 def compute_class_weights(y_train: np.ndarray) -> Dict[int, float]:
@@ -35,7 +35,7 @@ def extract_dense(siamese: Model) -> Model:
         siamese.layers[-1]
     ], name='dense')
 
-
+'''
 def train():
     """Train wound analysis model."""
     with open(HYP_FILE) as fin:
@@ -65,7 +65,7 @@ def train():
     dense = extract_dense(siamese)
     dense.save_weights(DENSE_FILE)
     print('Dense weights saved to ', DENSE_FILE)
-
+'''
 
 if __name__ == '__main__':
     gpu_init()

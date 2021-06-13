@@ -1,0 +1,7 @@
+tensorflow-cpu
+flask
+flask_cors
+Image
+
+potentially unnecessary:
+scipy

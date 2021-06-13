@@ -5,11 +5,11 @@ from typing import Tuple
 import numpy as np  # type: ignore
 from PIL import Image  # type: ignore
 from tensorflow.keras import Model  # type: ignore
-from wound_analysis.api.siamese_model.data_process import load_data, process_img
-from wound_analysis.api.siamese_model.model import get_encoder_model, get_siamese_model
-from wound_analysis.api.siamese_model.model import ENCODER_FILE, HYP_FILE, DENSE_FILE
-from wound_analysis.api.siamese_model.train import extract_dense
-from wound_analysis.api.siamese_model.center import CENTERS_FILE
+from api.data_process import load_data, process_img
+from api.model import get_encoder_model, get_siamese_model
+from api.model import ENCODER_FILE, HYP_FILE, DENSE_FILE
+from api.train import extract_dense
+from api.center import CENTERS_FILE
 
 
 def load_encoder(in_shape: Tuple[int, ...], model_path):

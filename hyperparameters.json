@@ -1,10 +1,9 @@
 {
   "img_width": 40,
   "img_height": 40,
-  "blur_radius": 2,
-  "test_size": 0.2,
+  "blur_radius": 3,
   "val_size": 0.2,
   "epochs": 30,
-  "batch_size": 5,
+  "batch_size": 32,
   "learning_rate": 0.00005
 }

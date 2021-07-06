@@ -5,7 +5,7 @@ from typing import Tuple
 import numpy as np  # type: ignore
 from PIL import Image  # type: ignore
 from tensorflow.keras import Model  # type: ignore
-from data_process import load_data, process_img
+from dataset import load_data, process_img
 from model import get_encoder_model, get_siamese_model
 from model import ENCODER_FILE, HYP_FILE, DENSE_FILE
 from train import extract_dense

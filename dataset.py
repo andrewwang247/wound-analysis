@@ -19,33 +19,23 @@ def process_img(img: Image.Image,
                 width: int,
                 height: int,
                 blur_radius: int) -> np.ndarray:
-    """Serve as placeholder for prediction."""
-    pass
-
-
-def open_img(fpath: str,
-             width: int,
-             height: int,
-             blur_radius: int) -> np.ndarray:
-    """Open, resize, and blur image."""
-    img = Image.open(fpath) \
-        .resize((width, height)) \
+    """Resize and blur PIL image."""
+    proc = img.resize((width, height)) \
         .filter(GaussianBlur(blur_radius))
-    return np.asarray_chkfinite(img) / NORM
+    return np.asarray_chkfinite(proc) / NORM
 
 
-def load_imgs(
-        direc: str,
-        width: int,
-        height: int,
-        blur_radius: int) -> np.ndarray:
+def load_imgs(direc: str,
+              width: int,
+              height: int,
+              blur_radius: int) -> np.ndarray:
     """Load, preprocess, and normalize images from dir."""
     print(f'Loading and processing {direc}...')
     img_lst = listdir(direc)
     images = np.empty((len(img_lst), height, width, 3), dtype=float)
     for idx, fpath in tqdm(enumerate(img_lst), total=len(img_lst)):
-        images[idx, ...] = open_img(path.join(direc, fpath),
-                                    width, height, blur_radius)
+        img = Image.open(path.join(direc, fpath))
+        images[idx, ...] = process_img(img, width, height, blur_radius)
     return images
 
 

@@ -55,21 +55,23 @@ def train():
     siamese.compile(optimizer=Adam(learning_rate=hyp['learning_rate']),
                     loss='binary_crossentropy',
                     metrics=['accuracy'])
-    siamese.fit(split_pairs(img_pairs), lbl_pairs,
-                epochs=hyp['epochs'],
-                batch_size=hyp['batch_size'],
-                class_weight=compute_class_weights(lbl_pairs),
-                validation_split=hyp['val_size'],
-                callbacks=[ModelCheckpoint(SIAMESE_FILE,
-                                           save_best_only=True)])
-    siamese.load_weights(SIAMESE_FILE)
-    print('Siamese weights saved to', SIAMESE_FILE)
-    encoder = extract_encoder(siamese)
-    encoder.save_weights(ENCODER_FILE)
-    print('Encoder weights saved to', ENCODER_FILE)
-    dense = extract_dense(siamese)
-    dense.save_weights(DENSE_FILE)
-    print('Dense weights saved to', DENSE_FILE)
+    try:
+        siamese.fit(split_pairs(img_pairs), lbl_pairs,
+                    epochs=hyp['epochs'],
+                    batch_size=hyp['batch_size'],
+                    class_weight=compute_class_weights(lbl_pairs),
+                    validation_split=hyp['val_size'],
+                    callbacks=[ModelCheckpoint(SIAMESE_FILE,
+                                               save_best_only=True)])
+    finally:
+        siamese.load_weights(SIAMESE_FILE)
+        print('Siamese weights saved to', SIAMESE_FILE)
+        encoder = extract_encoder(siamese)
+        encoder.save_weights(ENCODER_FILE)
+        print('Encoder weights saved to', ENCODER_FILE)
+        dense = extract_dense(siamese)
+        dense.save_weights(DENSE_FILE)
+        print('Dense weights saved to', DENSE_FILE)
 
 
 if __name__ == '__main__':
